@@ -1,4 +1,4 @@
-package gl
+package com.flamappai.gl
 
 import android.content.Context
 import android.opengl.GLES20

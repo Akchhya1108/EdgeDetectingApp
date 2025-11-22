@@ -1,16 +1,20 @@
-package camera
+package com.flamappai.camera
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.hardware.camera2.*
+import android.hardware.camera2.params.OutputConfiguration
+import android.hardware.camera2.params.SessionConfiguration
 import android.media.Image
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Size
 import androidx.core.content.ContextCompat
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 
 typealias FrameCallback = (rgba: ByteArray, width: Int, height: Int) -> Unit
 
@@ -88,9 +92,9 @@ class CameraController(
         val device = cameraDevice ?: return
         val surface = imageReader?.surface ?: return
 
-        val outputConfig = android.hardware.camera2.params.OutputConfiguration(surface)
-        val sessionConfig = android.hardware.camera2.params.SessionConfiguration(
-            android.hardware.camera2.params.SessionConfiguration.SESSION_REGULAR,
+        val outputConfig = OutputConfiguration(surface)
+        val sessionConfig = SessionConfiguration(
+            SessionConfiguration.SESSION_REGULAR,
             listOf(outputConfig),
             context.mainExecutor,
             object : CameraCaptureSession.StateCallback() {
@@ -166,13 +170,13 @@ class CameraController(
         }
 
         val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
-        val out = java.io.ByteArrayOutputStream()
+        val out = ByteArrayOutputStream()
         yuvImage.compressToJpeg(Rect(0, 0, width, height), 80, out)
         val jpegBytes = out.toByteArray()
 
         val bitmap = BitmapFactory.decodeByteArray(jpegBytes, 0, jpegBytes.size)
         val rgba = ByteArray(width * height * 4)
-        val buffer = java.nio.ByteBuffer.wrap(rgba)
+        val buffer = ByteBuffer.wrap(rgba)
         bitmap.copyPixelsToBuffer(buffer)
         bitmap.recycle()
         return rgba
