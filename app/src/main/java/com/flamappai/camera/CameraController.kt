@@ -5,16 +5,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.hardware.camera2.*
-import android.hardware.camera2.params.OutputConfiguration
-import android.hardware.camera2.params.SessionConfiguration
 import android.media.Image
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Size
+import android.view.Surface
 import androidx.core.content.ContextCompat
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 
 typealias FrameCallback = (rgba: ByteArray, width: Int, height: Int) -> Unit
 
@@ -92,27 +89,36 @@ class CameraController(
         val device = cameraDevice ?: return
         val surface = imageReader?.surface ?: return
 
-        val outputConfig = OutputConfiguration(surface)
-        val sessionConfig = SessionConfiguration(
-            SessionConfiguration.SESSION_REGULAR,
-            listOf(outputConfig),
-            context.mainExecutor,
-            object : CameraCaptureSession.StateCallback() {
-                override fun onConfigured(s: CameraCaptureSession) {
-                    session = s
-                    val builder = device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                    builder.addTarget(surface)
-                    builder.set(
-                        CaptureRequest.CONTROL_AF_MODE,
-                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO
-                    )
-                    s.setRepeatingRequest(builder.build(), null, bgHandler)
-                }
+        try {
+            // Use deprecated but compatible API for minSdk 24
+            @Suppress("DEPRECATION")
+            device.createCaptureSession(
+                listOf(surface),
+                object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(s: CameraCaptureSession) {
+                        val cam = cameraDevice ?: return
 
-                override fun onConfigureFailed(s: CameraCaptureSession) {}
-            }
-        )
-        device.createCaptureSession(sessionConfig)
+                        session = s
+                        try {
+                            val builder = cam.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                            builder.addTarget(surface)
+                            builder.set(
+                                CaptureRequest.CONTROL_AF_MODE,
+                                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO
+                            )
+                            s.setRepeatingRequest(builder.build(), null, bgHandler)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+
+                    override fun onConfigureFailed(s: CameraCaptureSession) {}
+                },
+                bgHandler
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun onImageAvailable(reader: ImageReader) {
@@ -170,13 +176,13 @@ class CameraController(
         }
 
         val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
-        val out = ByteArrayOutputStream()
+        val out = java.io.ByteArrayOutputStream()
         yuvImage.compressToJpeg(Rect(0, 0, width, height), 80, out)
         val jpegBytes = out.toByteArray()
 
         val bitmap = BitmapFactory.decodeByteArray(jpegBytes, 0, jpegBytes.size)
         val rgba = ByteArray(width * height * 4)
-        val buffer = ByteBuffer.wrap(rgba)
+        val buffer = java.nio.ByteBuffer.wrap(rgba)
         bitmap.copyPixelsToBuffer(buffer)
         bitmap.recycle()
         return rgba
@@ -196,4 +202,3 @@ class CameraController(
         bgHandler = null
     }
 }
-
