@@ -14,7 +14,7 @@ message(STATUS "Project Root: ${PROJECT_ROOT}")
 message(STATUS "JNI Directory: ${JNI_DIR}")
 
 # ===== OpenCV Android SDK path =====
-set(OPENCV_ANDROID_SDK_ROOT "C:/Android/OpenCV/opencv-4.12.0-android-sdk")
+set(OPENCV_ANDROID_SDK_ROOT "C:/Android/OpenCV/opencv-4.12.0-android-sdk/OpenCV-android-sdk")
 set(OPENCV_NATIVE_DIR "${OPENCV_ANDROID_SDK_ROOT}/sdk/native")
 
 # Include OpenCV headers
