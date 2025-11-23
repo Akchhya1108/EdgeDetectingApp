@@ -1,0 +1,16 @@
+{
+  "name": "flamappai-web-viewer",
+  "version": "1.0.0",
+  "description": "TypeScript web viewer for FlamappAI edge detection frames",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "tsc && node -e \"require('http').createServer((req, res) => { const fs = require('fs'); const path = require('path'); let file = req.url === '/' ? '/index.html' : req.url; const ext = path.extname(file); const contentType = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg' }[ext] || 'text/plain'; fs.readFile('.' + file, (err, data) => { if (err) { res.writeHead(404); res.end('Not found'); } else { res.writeHead(200, { 'Content-Type': contentType }); res.end(data); } }); }).listen(8080, () => console.log('Server running at http://localhost:8080'));\""
+  },
+  "keywords": ["typescript", "opencv", "edge-detection", "viewer"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
