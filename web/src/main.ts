@@ -160,23 +160,28 @@ class EdgeViewer {
 
     private toggleAnimation(): void {
         const btn = document.getElementById('animateBtn');
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-            this.animationId = null;
+        if (this.animationId !== null) {
+            this.animationId = null; // Stop animation
             if (btn) btn.textContent = '▶ Animate';
             console.log('Animation stopped');
         } else {
-            this.animate();
             if (btn) btn.textContent = '⏸ Stop';
+            this.animationId = 1; // Set to non-null value
             console.log('Animation started');
+            this.animate();
         }
     }
 
     private animate(): void {
+        if (this.animationId === null) return; // Stop if cancelled
+
         this.generateNewSample();
-        this.animationId = requestAnimationFrame(() => {
-            setTimeout(() => this.animate(), 100);
-        }) as unknown as number;
+
+        setTimeout(() => {
+            if (this.animationId !== null) {
+                this.animate();
+            }
+        }, 100);
     }
 
     private updateStats(): void {
