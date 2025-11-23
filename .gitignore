@@ -17,3 +17,6 @@ local.properties
 # Web dependencies
 web/node_modules/
 web/package-lock.json
+notepad .gitignore
+node_modules/
+web/dist/

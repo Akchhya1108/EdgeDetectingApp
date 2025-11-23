@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlamappAI Edge Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🔬 FlamappAI Edge Detection Viewer</h1>
+        <p class="subtitle">Real-time OpenCV C++ Processing</p>
+    </header>
+
+    <main>
+        <div class="viewer-section">
+            <div class="canvas-wrapper">
+                <canvas id="frameCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>📊 Frame Statistics</h2>
+            <div id="stats" class="stats-grid">
+                <!-- Stats populated by TypeScript -->
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>ℹ️ About</h2>
+            <p>This web viewer displays processed frames from the FlamappAI Android edge detection app.</p>
+            <ul>
+                <li><strong>Technology:</strong> OpenCV C++ via JNI</li>
+                <li><strong>Processing:</strong> Canny Edge Detection</li>
+                <li><strong>Platform:</strong> Android Camera2 API + OpenGL ES 2.0</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>FlamappAI EdgeViewer - R&D Intern Assessment 2025</p>
+    </footer>
+</div>
+
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>
