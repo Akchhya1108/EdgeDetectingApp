@@ -137,8 +137,6 @@ Screenshots & demos
 
 <img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/741ce422-9162-443a-94aa-b4639cb1e6b6" />
 
-<img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/8cd63dc9-7988-4e91-b93a-10f1a2f8ff12" />
-
 <img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/1d3d3a12-5794-44d8-91b4-09398b1309f7" />
 
 <img width="1895" height="964" alt="Screenshot 2025-11-23 143945" src="https://github.com/user-attachments/assets/83b46909-d7e2-46b6-b60c-c54a93149a3a" />
