@@ -139,7 +139,7 @@ Contributing
 - Please include platform/NDK/CMake versions in PR descriptions for native changes.
 
 License
-- This project is provided for educational and demonstration purposes. (Add a license file if you want an explicit license, e.g., MIT — create LICENSE)
+- This project is provided for educational and demonstration purposes.
 
 Acknowledgements
 - OpenCV project — computer vision library
@@ -149,4 +149,4 @@ Author
 - Akchhya (Akchhya1108) — demonstrates real-time CV integration on Android
 
 Screenshots & demos
-- See docs/screenshots/ for sample images and web viewer screenshots.
+
