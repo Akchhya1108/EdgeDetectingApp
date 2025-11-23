@@ -95,11 +95,6 @@ Android — Build & Run
    - In Android Studio: Run → Select device → Grant camera permissions at runtime when the app launches
    - The app should start and show live camera feed with selectable modes (Raw/Gray/Edges)
 
-Notes & tips
-- Emulator camera and performance are not reliable for native/NDK+OpenCV processing; use a real device.
-- If native compilation fails, ensure NDK and CMake versions match the project's Gradle setup.
-- If OpenCV include/link errors occur, confirm the OPENCV_ANDROID_SDK_ROOT path and CMake configuration.
-
 Web viewer — Build & Run
 
 1. Change into the web directory
@@ -124,12 +119,6 @@ Integration with the Android app
   - edgeViewer.updateFromBase64(base64, metadata)
   - edgeViewer.updateFrame(url, metadata)
 
-Common configuration problems & troubleshooting
-- "OpenCV headers not found" — Check OPENCV_ANDROID_SDK_ROOT and ensure Android Studio is pointing to the right CMake/NDK.
-- "JNI symbol not found" — Confirm native methods signatures match Java/Kotlin declarations and verify ABI filters (arm64-v8a/armeabi-v7a).
-- Low FPS — try building with Release config (optimization), reduce preview resolution or skip some processing.
-- Wrong orientation — ensure device rotation matrix is applied before handing data to native code.
-
 Contributing
 - Contributions welcome. Suggested workflow:
   - Fork the repository
@@ -141,12 +130,21 @@ Contributing
 License
 - This project is provided for educational and demonstration purposes.
 
-Acknowledgements
-- OpenCV project — computer vision library
-- Android Camera2 / NDK / OpenGL documentation and samples
-
 Author
 - Akchhya (Akchhya1108) — demonstrates real-time CV integration on Android
 
 Screenshots & demos
+
+<img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/741ce422-9162-443a-94aa-b4639cb1e6b6" />
+
+<img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/8cd63dc9-7988-4e91-b93a-10f1a2f8ff12" />
+
+<img width="540" height="1200" alt="image" src="https://github.com/user-attachments/assets/1d3d3a12-5794-44d8-91b4-09398b1309f7" />
+
+<img width="1895" height="964" alt="Screenshot 2025-11-23 143945" src="https://github.com/user-attachments/assets/83b46909-d7e2-46b6-b60c-c54a93149a3a" />
+
+<img width="1888" height="1016" alt="Screenshot 2025-11-23 143434" src="https://github.com/user-attachments/assets/fbdaea6c-912a-4db5-9b8d-70d0b825b0b7" />
+
+<img width="1919" height="1016" alt="Screenshot 2025-11-23 132428" src="https://github.com/user-attachments/assets/5012866d-d53d-41f4-8f6b-0ddb60cc1a39" />
+
 
