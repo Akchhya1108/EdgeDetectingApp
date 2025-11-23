@@ -5,7 +5,7 @@ R&D Intern Assessment 2025 - A complete Android edge detection application with 
 ✨ Features
 🤖 Android Application
 
-✅ Real-time camera capture using Camera2 API
+✅ Real-time camera capture using Camera2 API\n
 ✅ Native C++ processing via JNI/NDK for optimal performance
 ✅ OpenCV edge detection using Canny algorithm
 ✅ OpenGL ES 2.0 rendering for GPU-accelerated display
