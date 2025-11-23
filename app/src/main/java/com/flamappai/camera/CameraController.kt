@@ -128,14 +128,19 @@ class CameraController(
 
     private fun onImageAvailable(reader: ImageReader) {
         val image = reader.acquireLatestImage() ?: return
+
+        // Get dimensions BEFORE closing image
+        val originalW = image.width
+        val originalH = image.height
+
         val rgba = yuvToRgba(image)
         image.close()
 
         // Dimensions might be swapped after rotation
         val w = if (sensorOrientation == 90 || sensorOrientation == 270)
-            image.height else image.width
+            originalH else originalW
         val h = if (sensorOrientation == 90 || sensorOrientation == 270)
-            image.width else image.height
+            originalW else originalH
 
         onFrame(rgba, w, h)
     }
