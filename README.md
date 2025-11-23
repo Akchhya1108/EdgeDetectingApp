@@ -2,29 +2,41 @@
 
 A powerful Android application for AI-powered edge detection and image processing.
 
-📱 Features
-Core Functionality
+## 📱 Features
 
-Multiple Edge Detection Modes - Switch between different edge detection algorithms for optimal results
-Real-time Processing - Instant image processing and preview
-Grey Mode - Convert images to grayscale for better edge detection
-Raw Mode - View original images without any filters applied
-Edge Enhancement - Three different edge detection intensity levels for precise control
+### 🎯 Core Functionality
 
-User Experience
+- **🔍 Multiple Edge Detection Modes** - Switch between different edge detection algorithms for optimal results
 
-Intuitive Interface - Clean and easy-to-navigate UI design
-WebViewer Integration - Built-in web viewing capabilities for enhanced functionality
-Statistics Display - View processing statistics and performance metrics
-Upload Functionality - Easy image upload and processing workflow
-Mode Switching - Seamlessly switch between different viewing and processing modes
+- **⚡ Real-time Processing** - Instant image processing and preview
 
-Technical Capabilities
+- **⚫ Grey Mode** - Convert images to grayscale for better edge detection
 
-AI-Powered Edge Detection - Leverages advanced algorithms for accurate edge detection
-Efficient Processing - Optimized for performance on Android devices
-Multiple Input Formats - Support for various image formats
-Export Options - Save processed images to device storage
+- **📷 Raw Mode** - View original images without any filters applied
+
+- **✨ Edge Enhancement** - Three different edge detection intensity levels for precise control
+
+### 🎨 User Experience
+
+- **🖼️ Intuitive Interface** - Clean and easy-to-navigate UI design
+
+- **🌐 WebViewer Integration** - Built-in web viewing capabilities for enhanced functionality
+
+- **📊 Statistics Display** - View processing statistics and performance metrics
+
+- **📤 Upload Functionality** - Easy image upload and processing workflow
+
+- **🔄 Mode Switching** - Seamlessly switch between different viewing and processing modes
+
+### 🛠️ Technical Capabilities
+
+- **🤖 AI-Powered Edge Detection** - Leverages advanced algorithms for accurate edge detection
+
+- **🚀 Efficient Processing** - Optimized for performance on Android devices
+
+- **📁 Multiple Input Formats** - Support for various image formats
+
+- **💾 Export Options** - Save processed images to device storage
 
 ## 🎥 Demo
 
@@ -62,39 +74,52 @@ Export Options - Save processed images to device storage
   </tr>
 </table>
 
-## 🛠️ Tech Stack
+🛠️ Tech Stack
 
-- **Language:** Kotlin
-- **Build System:** Gradle
-- **Platform:** Android
+Language: Kotlin
+Build System: Gradle
+Platform: Android
 
-## 🚀 Getting Started
+🚀 Getting Started
+📋 Prerequisites
 
-### Prerequisites
+Android Studio Arctic Fox or later
+Android SDK (API level 21+)
+Kotlin plugin
+JDK 11 or higher
+Gradle 7.0+
 
-- Android Studio
-- Android SDK
-- Kotlin plugin
+⚙️ Requirements
 
-### Installation
+Minimum SDK: API 21 (Android 5.0 Lollipop)
+Target SDK: API 34 (Android 14)
+Compile SDK: API 34
+Minimum RAM: 2GB
+Recommended RAM: 4GB or higher
+Storage: 50MB for app installation
+Permissions Required:
 
-1. Clone the repository
-```bash
-git clone https://github.com/Akchhya1108/EdgeDetectingApp.git
-```
+Camera access (for real-time processing)
+Storage access (for saving processed images)
+Internet access (for WebViewer features)
 
-2. Open the project in Android Studio
 
-3. Build the project
-```bash
-./gradlew build
-```
 
-4. Run on your device or emulator
+🔧 Installation
 
-## 📂 Project Structure
+Clone the repository
 
-```
+bashgit clone https://github.com/Akchhya1108/EdgeDetectingApp.git
+
+Open the project in Android Studio
+Build the project
+
+bash./gradlew build
+
+Run on your device or emulator
+
+📂 Project Structure
+
 FlamappAI-EdgeViewer/
 ├── .kotlin/
 ├── app/
@@ -107,15 +132,15 @@ FlamappAI-EdgeViewer/
 │       ├── App_SS/
 │       └── WebViewer/
 └── gradle/
-```
 
-## 🤝 Contributing
-
+🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-
-## 👨‍💻 Author
-
+👨‍💻 Author
 Akchhya
+
+🙏 Acknowledgments
+
+Inspired by modern AI edge detection techniques
 
 ⭐ Star this repo if you find it useful!
