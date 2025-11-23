@@ -41,8 +41,15 @@ class MainActivity : AppCompatActivity() {
         txtFps = findViewById(R.id.txtFps)
 
         val size = Size(640, 480)
+        var isInitialized = false
 
         cameraController = CameraController(this, size) { rgba, w, h ->
+            // Initialize native processor with actual frame dimensions on first frame
+            if (!isInitialized) {
+                NativeProcessor.nativeInit(w, h)
+                isInitialized = true
+            }
+
             val ms = measureTimeMillis {
                 NativeProcessor.nativeProcessFrameRgba(rgba, w, h, mode)
             }
@@ -79,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         glView.onResume()
 
         if (cameraController.hasPermission()) {
-            NativeProcessor.nativeInit(640, 480)
             startCamera()
         } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)
