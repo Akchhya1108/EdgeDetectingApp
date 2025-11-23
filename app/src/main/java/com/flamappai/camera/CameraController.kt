@@ -14,6 +14,7 @@ import android.view.Surface
 import androidx.core.content.ContextCompat
 
 typealias FrameCallback = (rgba: ByteArray, width: Int, height: Int) -> Unit
+data class ProcessedFrame(val rgba: ByteArray, val width: Int, val height: Int)
 private var sensorOrientation = 0
 
 class CameraController(
@@ -129,23 +130,14 @@ class CameraController(
     private fun onImageAvailable(reader: ImageReader) {
         val image = reader.acquireLatestImage() ?: return
 
-        // Get dimensions BEFORE closing image
-        val originalW = image.width
-        val originalH = image.height
-
-        val rgba = yuvToRgba(image)
+        val frame = yuvToRgba(image)
         image.close()
 
-        // Dimensions might be swapped after rotation
-        val w = if (sensorOrientation == 90 || sensorOrientation == 270)
-            originalH else originalW
-        val h = if (sensorOrientation == 90 || sensorOrientation == 270)
-            originalW else originalH
-
-        onFrame(rgba, w, h)
+        // Use the actual dimensions from the processed frame
+        onFrame(frame.rgba, frame.width, frame.height)
     }
 
-    private fun yuvToRgba(image: Image): ByteArray {
+    private fun yuvToRgba(image: Image): ProcessedFrame {
         val width = image.width
         val height = image.height
 
@@ -206,7 +198,8 @@ class CameraController(
         val buffer = java.nio.ByteBuffer.wrap(rgba)
         bitmap.copyPixelsToBuffer(buffer)
         bitmap.recycle()
-        return rgba
+
+        return ProcessedFrame(rgba, finalWidth, finalHeight)
     }
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
         if (degrees == 0) return bitmap
