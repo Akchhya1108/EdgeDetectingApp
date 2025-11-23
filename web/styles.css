@@ -48,6 +48,7 @@ main {
 }
 
 .canvas-wrapper {
+    position: relative;
     background: #000;
     border-radius: 10px;
     overflow: hidden;
@@ -56,12 +57,49 @@ main {
     justify-content: center;
     align-items: center;
     min-height: 400px;
+    transition: all 0.3s ease;
+}
+
+.canvas-wrapper:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Upload overlay - shows when dragging files */
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(102, 126, 234, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.canvas-wrapper.drag-over .upload-overlay {
+    display: flex;
+}
+
+.upload-hint {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+    border: 3px dashed white;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 #frameCanvas {
     max-width: 100%;
     height: auto;
     display: block;
+    position: relative;
+    z-index: 1;
 }
 
 .controls {
@@ -81,6 +119,26 @@ main {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn:hover {
@@ -112,12 +170,13 @@ main {
     color: white;
     cursor: pointer;
     display: inline-block;
+    position: relative;
+    z-index: 1;
 }
 
-.btn-upload {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    color: white;
-    cursor: pointer;
+.btn-upload:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(250, 112, 154, 0.4);
 }
 
 .stats-section {
@@ -137,6 +196,7 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
+    margin-bottom: 15px;
 }
 
 .stat-item {
@@ -146,6 +206,12 @@ main {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .stat-label {
@@ -159,6 +225,21 @@ main {
     font-size: 1.5rem;
     color: #667eea;
     font-weight: bold;
+}
+
+/* New stats info section */
+.stats-info {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    margin-top: 15px;
+}
+
+.stats-info p {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
 }
 
 .info-section {
@@ -183,6 +264,7 @@ main {
 .info-section ul {
     list-style: none;
     padding-left: 0;
+    margin-bottom: 20px;
 }
 
 .info-section li {
@@ -195,6 +277,30 @@ main {
     color: #664d03;
 }
 
+/* Feature badges */
+.feature-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
 footer {
     background: #2c3e50;
     color: white;
@@ -203,6 +309,21 @@ footer {
     font-size: 0.9rem;
 }
 
+/* Loading animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.canvas-wrapper.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
     header h1 {
         font-size: 1.8rem;
@@ -214,5 +335,21 @@ footer {
 
     main {
         padding: 20px;
+    }
+
+    .controls {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .feature-badges {
+        flex-direction: column;
+    }
+
+    .badge {
+        text-align: center;
     }
 }

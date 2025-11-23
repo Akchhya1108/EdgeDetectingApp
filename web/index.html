@@ -17,6 +17,11 @@
         <div class="viewer-section">
             <div class="canvas-wrapper">
                 <canvas id="frameCanvas"></canvas>
+                <div id="uploadOverlay" class="upload-overlay">
+                    <div class="upload-hint">
+                        📤 Drop Android screenshot here or click Upload button
+                    </div>
+                </div>
             </div>
 
             <div class="controls">
@@ -33,6 +38,9 @@
             <div id="stats" class="stats-grid">
                 <!-- Stats populated by TypeScript -->
             </div>
+            <div id="statsInfo" class="stats-info">
+                <p>💡 <strong>Tip:</strong> Upload an Android screenshot to see real frame stats!</p>
+            </div>
         </div>
 
         <div class="info-section">
@@ -43,6 +51,13 @@
                 <li><strong>Processing:</strong> Canny Edge Detection</li>
                 <li><strong>Platform:</strong> Android Camera2 API + OpenGL ES 2.0</li>
             </ul>
+
+            <div class="feature-badges">
+                <span class="badge">📱 Real-time Processing</span>
+                <span class="badge">🎯 3 Modes: Raw/Gray/Edges</span>
+                <span class="badge">⚡ 20-30 FPS</span>
+                <span class="badge">🔧 C++ Native Code</span>
+            </div>
         </div>
     </main>
 
