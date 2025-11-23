@@ -16,6 +16,7 @@ class EdgeViewer {
     private ctx: CanvasRenderingContext2D;
     private statsDiv: HTMLElement;
     private currentStats: FrameStats;
+    private animationId: number | null = null;
 
     constructor() {
         this.canvas = document.getElementById('frameCanvas') as HTMLCanvasElement;
@@ -36,13 +37,31 @@ class EdgeViewer {
 
     private init(): void {
         console.log('EdgeViewer initialized');
+        this.setupButtons();
         this.loadSampleFrame();
         this.updateStats();
     }
 
+    private setupButtons(): void {
+        const refreshBtn = document.getElementById('refreshBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const animateBtn = document.getElementById('animateBtn');
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.generateNewSample());
+        }
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => this.exportFrame());
+        }
+
+        if (animateBtn) {
+            animateBtn.addEventListener('click', () => this.toggleAnimation());
+        }
+    }
+
     private loadSampleFrame(): void {
         // Create a sample edge-detected frame
-        // In real implementation, this would load from Android app
         const img = new Image();
 
         img.onload = () => {
@@ -53,12 +72,10 @@ class EdgeViewer {
         };
 
         img.onerror = () => {
-            // If sample image not found, draw a placeholder
             console.log('Sample image not found, drawing placeholder');
             this.drawPlaceholder();
         };
 
-        // Try to load sample image from assets
         img.src = 'assets/sample_frame.png';
     }
 
@@ -70,29 +87,96 @@ class EdgeViewer {
         this.ctx.fillStyle = '#000000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw some sample edge lines to simulate edge detection
-        this.ctx.strokeStyle = '#FFFFFF';
-        this.ctx.lineWidth = 2;
-
-        // Random edge-like patterns
-        for (let i = 0; i < 50; i++) {
-            this.ctx.beginPath();
-            const x1 = Math.random() * this.canvas.width;
-            const y1 = Math.random() * this.canvas.height;
-            const x2 = x1 + (Math.random() - 0.5) * 100;
-            const y2 = y1 + (Math.random() - 0.5) * 100;
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-            this.ctx.stroke();
-        }
+        // Draw realistic edge detection pattern
+        this.drawEdgePattern();
 
         // Add text overlay
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = '20px Arial';
+        this.ctx.font = 'bold 24px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Sample Edge Detection Frame', this.canvas.width / 2, this.canvas.height / 2);
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText('(Placeholder - Replace with actual frame)', this.canvas.width / 2, this.canvas.height / 2 + 30);
+        this.ctx.fillText('🔬 Sample Edge Detection', this.canvas.width / 2, 40);
+
+        this.ctx.font = '16px Arial';
+        this.ctx.fillStyle = '#AAAAAA';
+        this.ctx.fillText('Simulated Canny Edge Detection Output', this.canvas.width / 2, 70);
+    }
+
+    private drawEdgePattern(): void {
+        this.ctx.strokeStyle = '#FFFFFF';
+        this.ctx.lineWidth = 1;
+
+        // Draw geometric shapes with edges
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+
+        // Circle edges
+        for (let r = 50; r < 200; r += 30) {
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+            this.ctx.stroke();
+        }
+
+        // Rectangular edges
+        this.ctx.strokeRect(centerX - 150, centerY - 100, 300, 200);
+        this.ctx.strokeRect(centerX - 120, centerY - 80, 240, 160);
+
+        // Random noise lines (simulate detailed edges)
+        for (let i = 0; i < 100; i++) {
+            const x = Math.random() * this.canvas.width;
+            const y = Math.random() * this.canvas.height;
+            const len = 10 + Math.random() * 30;
+            const angle = Math.random() * Math.PI * 2;
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+            this.ctx.globalAlpha = 0.3 + Math.random() * 0.7;
+            this.ctx.stroke();
+        }
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    private generateNewSample(): void {
+        // Update stats with random values
+        this.currentStats.fps = 20 + Math.random() * 15;
+        this.currentStats.processingTime = 10 + Math.floor(Math.random() * 20);
+        this.currentStats.mode = ['Raw', 'Grayscale', 'Edge Detection'][Math.floor(Math.random() * 3)];
+
+        // Redraw
+        this.drawPlaceholder();
+        this.updateStats();
+
+        console.log('Generated new sample frame');
+    }
+
+    private exportFrame(): void {
+        const dataURL = this.canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `edge_frame_${Date.now()}.png`;
+        link.href = dataURL;
+        link.click();
+        console.log('Frame exported');
+    }
+
+    private toggleAnimation(): void {
+        const btn = document.getElementById('animateBtn');
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+            if (btn) btn.textContent = '▶ Animate';
+            console.log('Animation stopped');
+        } else {
+            this.animate();
+            if (btn) btn.textContent = '⏸ Stop';
+            console.log('Animation started');
+        }
+    }
+
+    private animate(): void {
+        this.generateNewSample();
+        this.animationId = requestAnimationFrame(() => {
+            setTimeout(() => this.animate(), 100);
+        }) as unknown as number;
     }
 
     private updateStats(): void {
@@ -128,18 +212,36 @@ class EdgeViewer {
             this.canvas.height = img.height;
             this.ctx.drawImage(img, 0, 0);
             this.updateStats();
+            console.log('Frame updated from external source');
+        };
+        img.onerror = () => {
+            console.error('Failed to load image from:', imageData.substring(0, 50) + '...');
         };
         img.src = imageData;
+    }
+
+    public updateFromBase64(base64: string, stats?: Partial<FrameStats>): void {
+        // Helper method specifically for base64 strings
+        const dataURL = base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`;
+
+        if (stats) {
+            this.currentStats = { ...this.currentStats, ...stats };
+        }
+
+        this.updateFrame(dataURL, this.currentStats);
     }
 }
 
 // Initialize viewer when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('FlamappAI Web Viewer Starting...');
+    console.log('🚀 FlamappAI Web Viewer Starting...');
     const viewer = new EdgeViewer();
 
     // Make viewer globally accessible for testing
     (window as any).edgeViewer = viewer;
 
-    console.log('Viewer ready. You can call window.edgeViewer.updateFrame() to load new frames.');
+    console.log('✅ Viewer ready!');
+    console.log('📝 Try these commands in console:');
+    console.log('   edgeViewer.updateFromBase64("YOUR_BASE64_STRING")');
+    console.log('   edgeViewer.updateFrame("image_url.png", stats)');
 });
