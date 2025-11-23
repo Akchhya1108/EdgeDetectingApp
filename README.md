@@ -120,18 +120,65 @@ Run on your device or emulator
 
 📂 Project Structure
 
-FlamappAI-EdgeViewer/
-├── .kotlin/
-├── app/
-├── build/
+```text
+EdgeDetectingApp/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── android-app/                 # Kotlin Android application
+│   ├── app/
+│   │   ├── src/
+│   │   │   └── main/
+│   │   │       ├── java/com/akchhya/edgedetect/
+│   │   │       │   ├── MainActivity.kt
+│   │   │       │   ├── CameraProcessor.kt
+│   │   │       │   └── EdgeViewModel.kt
+│   │   │       ├── res/
+│   │   │       │   ├── layout/
+│   │   │       │   │   └── activity_main.xml
+│   │   │       │   └── values/
+│   │   │       │       └── strings.xml
+│   │   │       └── AndroidManifest.xml
+│   │   └── build.gradle.kts
+│   └── settings.gradle.kts
+├── web/                         # TypeScript + HTML/CSS front-end
+│   ├── public/
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── src/
+│   │   ├── index.tsx
+│   │   ├── App.tsx
+│   │   ├── styles/
+│   │   │   └── main.css
+│   │   └── components/
+│   │       ├── ImageUploader.tsx
+│   │       └── EdgePreview.tsx
+│   ├── package.json
+│   └── tsconfig.json
+├── native/                      # C++ native library (built with CMake)
+│   ├── CMakeLists.txt
+│   ├── include/
+│   │   └── edge_detector.h
+│   └── src/
+│       ├── edge_detector.cpp
+│       ├── image_utils.cpp
+│       └── bindings.cpp         # JNI / interop bindings (if any)
+├── shaders/                     # GLSL shaders used by native or GPU pipeline
+│   └── edge_shader.glsl
+├── cmake/                       # CMake helper scripts (optional)
+│   └── toolchain.cmake
+├── scripts/
+│   ├── build_native.sh
+│   └── run_web.sh
 ├── docs/
-│   ├── Demo_gif/
-│   │   ├── Demo_gif.mp4
-│   │   └── Demo_gif2.gif
-│   └── screenshots/
-│       ├── App_SS/
-│       └── WebViewer/
-└── gradle/
+│   └── architecture.md
+├── examples/
+│   └── sample_images/
+│       └── test1.jpg
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
