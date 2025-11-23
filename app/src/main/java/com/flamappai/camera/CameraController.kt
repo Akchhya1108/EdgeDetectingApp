@@ -1,5 +1,5 @@
 package com.flamappai.camera
-
+import android.graphics.Matrix
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,6 +14,7 @@ import android.view.Surface
 import androidx.core.content.ContextCompat
 
 typealias FrameCallback = (rgba: ByteArray, width: Int, height: Int) -> Unit
+private var sensorOrientation = 0
 
 class CameraController(
     private val context: Context,
@@ -53,6 +54,10 @@ class CameraController(
             chars.get(CameraCharacteristics.LENS_FACING) ==
                     CameraCharacteristics.LENS_FACING_BACK
         } ?: manager.cameraIdList.first()
+
+        // Get sensor orientation
+        val characteristics = manager.getCameraCharacteristics(cameraId)
+        sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
 
         imageReader = ImageReader.newInstance(
             size.width,
@@ -123,10 +128,15 @@ class CameraController(
 
     private fun onImageAvailable(reader: ImageReader) {
         val image = reader.acquireLatestImage() ?: return
-        val w = image.width
-        val h = image.height
         val rgba = yuvToRgba(image)
         image.close()
+
+        // Dimensions might be swapped after rotation
+        val w = if (sensorOrientation == 90 || sensorOrientation == 270)
+            image.height else image.width
+        val h = if (sensorOrientation == 90 || sensorOrientation == 270)
+            image.width else image.height
+
         onFrame(rgba, w, h)
     }
 
@@ -180,12 +190,32 @@ class CameraController(
         yuvImage.compressToJpeg(Rect(0, 0, width, height), 80, out)
         val jpegBytes = out.toByteArray()
 
-        val bitmap = BitmapFactory.decodeByteArray(jpegBytes, 0, jpegBytes.size)
-        val rgba = ByteArray(width * height * 4)
+        var bitmap = BitmapFactory.decodeByteArray(jpegBytes, 0, jpegBytes.size)
+
+        // Rotate bitmap to correct orientation
+        bitmap = rotateBitmap(bitmap, sensorOrientation)
+
+        val finalWidth = bitmap.width
+        val finalHeight = bitmap.height
+        val rgba = ByteArray(finalWidth * finalHeight * 4)
         val buffer = java.nio.ByteBuffer.wrap(rgba)
         bitmap.copyPixelsToBuffer(buffer)
         bitmap.recycle()
         return rgba
+    }
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        if (degrees == 0) return bitmap
+
+        val matrix = Matrix()
+        matrix.postRotate(degrees.toFloat())
+
+        val rotated = Bitmap.createBitmap(
+            bitmap, 0, 0,
+            bitmap.width, bitmap.height,
+            matrix, true
+        )
+        bitmap.recycle()
+        return rotated
     }
 
     private fun startBackground() {
