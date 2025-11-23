@@ -107,6 +107,19 @@ main {
     color: white;
 }
 
+.btn-upload {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    cursor: pointer;
+}
+
 .stats-section {
     background: #f8f9fa;
     padding: 25px;

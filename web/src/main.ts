@@ -46,6 +46,7 @@ class EdgeViewer {
         const refreshBtn = document.getElementById('refreshBtn');
         const exportBtn = document.getElementById('exportBtn');
         const animateBtn = document.getElementById('animateBtn');
+        const uploadInput = document.getElementById('uploadInput') as HTMLInputElement;
 
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => this.generateNewSample());
@@ -57,6 +58,10 @@ class EdgeViewer {
 
         if (animateBtn) {
             animateBtn.addEventListener('click', () => this.toggleAnimation());
+        }
+
+        if (uploadInput) {
+            uploadInput.addEventListener('change', (e) => this.handleFileUpload(e));
         }
     }
 
@@ -182,6 +187,40 @@ class EdgeViewer {
                 this.animate();
             }
         }, 100);
+    }
+
+    private handleFileUpload(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+
+        if (!file) return;
+
+        console.log('Loading file:', file.name);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataURL = e.target?.result as string;
+
+            // Create temporary image to get dimensions
+            const img = new Image();
+            img.onload = () => {
+                // Update stats with actual image dimensions
+                this.currentStats = {
+                    width: img.width,
+                    height: img.height,
+                    fps: 25.0,
+                    mode: 'Real Android Frame',
+                    processingTime: 0
+                };
+
+                // Display the image
+                this.updateFrame(dataURL, this.currentStats);
+                console.log('✅ Android frame loaded:', img.width + 'x' + img.height);
+            };
+            img.src = dataURL;
+        };
+
+        reader.readAsDataURL(file);
     }
 
     private updateStats(): void {
