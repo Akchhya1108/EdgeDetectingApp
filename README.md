@@ -1,49 +1,39 @@
 # FlamappAI-EdgeViewer
 
-A powerful Android application for AI-powered edge detection and image processing.
+A real-time Android edge detection application using OpenCV C++, OpenGL ES 2.0, and TypeScript web viewer.
 
 ## 📱 Features
 
 ### 🎯 Core Functionality
 
-- **🔍 Multiple Edge Detection Modes** - Switch between different edge detection algorithms for optimal results
-
-- **⚡ Real-time Processing** - Instant image processing and preview
-
-- **⚫ Grey Mode** - Convert images to grayscale for better edge detection
-
-- **📷 Raw Mode** - View original images without any filters applied
-
-- **✨ Edge Enhancement** - Three different edge detection intensity levels for precise control
+- **🔍 Real-time Edge Detection** - Canny edge detection at 20-30 FPS
+- **⚡ Native C++ Processing** - OpenCV via JNI for optimal performance
+- **🎨 OpenGL ES 2.0 Rendering** - Hardware-accelerated texture display
+- **⚫ Three Processing Modes** - Raw, Grayscale, and Edge Detection
+- **🌐 Web Viewer** - TypeScript viewer with real OpenCV.js processing
 
 ### 🎨 User Experience
 
-- **🖼️ Intuitive Interface** - Clean and easy-to-navigate UI design
-
-- **🌐 WebViewer Integration** - Built-in web viewing capabilities for enhanced functionality
-
-- **📊 Statistics Display** - View processing statistics and performance metrics
-
-- **📤 Upload Functionality** - Easy image upload and processing workflow
-
-- **🔄 Mode Switching** - Seamlessly switch between different viewing and processing modes
+- **🖼️ Real-time Preview** - Live camera feed with instant processing
+- **📊 Performance Metrics** - FPS counter and processing time display
+- **🔄 Mode Switching** - Seamless toggling between processing modes
+- **📤 Web Integration** - View and process images in browser
 
 ### 🛠️ Technical Capabilities
 
-- **🤖 AI-Powered Edge Detection** - Leverages advanced algorithms for accurate edge detection
-
-- **🚀 Efficient Processing** - Optimized for performance on Android devices
-
-- **📁 Multiple Input Formats** - Support for various image formats
-
-- **💾 Export Options** - Save processed images to device storage
+- **📷 Camera2 API** - Modern Android camera integration
+- **🔧 JNI Bridge** - Efficient Java ↔ C++ communication
+- **⚡ Optimized Pipeline** - Zero-copy frame processing where possible
+- **🌐 Cross-platform** - Android native + Web viewer
 
 ## 🎥 Demo
 
 ![Demo GIF](docs/Demo_gif/Demo_gif2.gif)
 
-📸 Screenshots
-Android App - Different Edge Detection Modes
+## 📸 Android App Screenshots
+
+### Real-time Edge Detection Modes
+
 <table>
   <tr>
     <td><img src="docs/screenshots/App_SS/app_edge_mode_1.jpeg" width="250"/></td>
@@ -51,12 +41,14 @@ Android App - Different Edge Detection Modes
     <td><img src="docs/screenshots/App_SS/app_edge_mode_3.jpeg" width="250"/></td>
   </tr>
   <tr>
-    <td align="center">Edge Mode 1</td>
-    <td align="center">Edge Mode 2</td>
-    <td align="center">Edge Mode 3</td>
+    <td align="center"><strong>Edge Mode - Low Threshold</strong><br/>Detects more edges with lower sensitivity</td>
+    <td align="center"><strong>Edge Mode - Medium Threshold</strong><br/>Balanced edge detection (default)</td>
+    <td align="center"><strong>Edge Mode - High Threshold</strong><br/>Only strong edges detected</td>
   </tr>
 </table>
-Android App - Additional Views
+
+### Processing Mode Comparison
+
 <table>
   <tr>
     <td><img src="docs/screenshots/App_SS/app_edges_mode.jpeg" width="250"/></td>
@@ -64,24 +56,34 @@ Android App - Additional Views
     <td><img src="docs/screenshots/App_SS/app_raw_mode.jpeg" width="250"/></td>
   </tr>
   <tr>
-    <td align="center">Edges Mode</td>
-    <td align="center">Grey Mode</td>
-    <td align="center">Raw Mode</td>
+    <td align="center"><strong>Canny Edge Detection</strong><br/>White edges on black background</td>
+    <td align="center"><strong>Grayscale Mode</strong><br/>Color to grayscale conversion</td>
+    <td align="center"><strong>Raw Camera Feed</strong><br/>Unprocessed original frames</td>
   </tr>
 </table>
 
-🌐 Web Viewer
-The project includes a TypeScript-based web viewer that performs real OpenCV.js edge detection in the browser.
-Web Viewer Main Interface
+**Performance:** Achieves 20-30 FPS on mid-range devices with 10-20ms processing time per frame.
+
+---
+
+## 🌐 Web Viewer
+
+TypeScript-based web viewer with **real OpenCV.js** implementation for client-side edge detection.
+
+### Web Viewer Interface
+
 <div align="center">
   <img src="docs/screenshots/WebViewer/web_viewer_main_1.png" width="700"/>
-  <p><em>Main interface with real-time OpenCV.js processing</em></p>
+  <p><em>Main interface with real-time OpenCV.js processing and statistics</em></p>
 </div>
+
 <div align="center">
   <img src="docs/screenshots/WebViewer/web_viewer_main_2.png" width="700"/>
-  <p><em>Web viewer with uploaded image and statistics</em></p>
+  <p><em>Uploaded image with edge detection applied - showing actual processing time</em></p>
 </div>
-Web Viewer - Processing Examples
+
+### Web Viewer - Processing Examples
+
 <table>
   <tr>
     <td><img src="docs/screenshots/WebViewer/ex_edge.png" width="280"/></td>
@@ -89,30 +91,42 @@ Web Viewer - Processing Examples
     <td><img src="docs/screenshots/WebViewer/ex_raw.png" width="280"/></td>
   </tr>
   <tr>
-    <td align="center"><strong>Canny Edge Detection</strong><br/>Real OpenCV.js processing</td>
-    <td align="center"><strong>Grayscale Mode</strong><br/>Color to gray conversion</td>
-    <td align="center"><strong>Raw Image Mode</strong><br/>Original uploaded image</td>
+    <td align="center"><strong>Canny Edge Detection</strong><br/>Real OpenCV.js processing with Gaussian blur</td>
+    <td align="center"><strong>Grayscale Conversion</strong><br/>RGBA to grayscale transformation</td>
+    <td align="center"><strong>Original Image</strong><br/>No processing applied</td>
   </tr>
 </table>
-Web Viewer - Upload Examples
+
+### Web Viewer - Upload Workflow
+
 <table>
   <tr>
     <td><img src="docs/screenshots/WebViewer/uploaded_edge_mode.png" width="350"/></td>
     <td><img src="docs/screenshots/WebViewer/uploaded_grey_mode.png" width="350"/></td>
   </tr>
   <tr>
-    <td align="center"><strong>Uploaded Image - Edge Detection</strong></td>
-    <td align="center"><strong>Uploaded Image - Grayscale</strong></td>
+    <td align="center"><strong>User Upload - Edge Detection</strong></td>
+    <td align="center"><strong>User Upload - Grayscale</strong></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/WebViewer/uploaded_raw.png" width="350"/></td>
     <td></td>
   </tr>
   <tr>
-    <td align="center"><strong>Uploaded Image - Raw Mode</strong></td>
+    <td align="center"><strong>User Upload - Raw Mode</strong></td>
     <td></td>
   </tr>
 </table>
+
+### 🔬 Web Viewer Features
+
+- ✅ **Real OpenCV.js** - Actual Canny edge detection (not simulated)
+- 📤 **Drag & Drop** - Easy image upload with visual feedback
+- 🎯 **Three Modes** - Raw, Grayscale, Edge Detection
+- ⚡ **Performance Stats** - Real processing time metrics
+- 💾 **Export** - Download processed images as PNG
+
+---
 
 🛠️ Tech Stack
 
@@ -221,18 +235,28 @@ EdgeDetectingApp/
 ```
 
 🤝 Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Please:
+
+Fork the repository
+Create feature branch (git checkout -b feature/YourFeature)
+Commit changes (git commit -m 'Add YourFeature')
+Push to branch (git push origin feature/YourFeature)
+Open Pull Request
 
 👨‍💻 Author
 Akchhya
+
 GitHub: @Akchhya1108
+Repository: FlamappAI-EdgeViewer
+
 
 🙏 Acknowledgments
 
-Inspired by modern AI edge detection techniques
-OpenCV library for computer vision algorithms
-Android CameraX for camera integration
-OpenCV.js for browser-based image processing
+OpenCV - Computer vision library (opencv.org)
+Android CameraX - Modern camera integration
+OpenCV.js - WebAssembly-compiled OpenCV for browsers
+OpenGL ES - Hardware-accelerated graphics rendering
 
 ⭐ Star this repo if you find it useful!
-FlamappAI EdgeViewer - Real-time edge detection on Android and Web | R&D Assessment 2025
+
+FlamappAI EdgeViewer - Real-time Edge Detection | R&D Intern Assessment 2025
