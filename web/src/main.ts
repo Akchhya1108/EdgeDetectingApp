@@ -1,6 +1,6 @@
 /**
- * FlamappAI Web Viewer - Enhanced with Upload Stats
- * Displays processed edge detection frames from Android app
+ * FlamappAI Web Viewer - WITH REAL OPENCV.JS EDGE DETECTION
+ * Performs actual Canny edge detection using OpenCV.js
  */
 
 interface FrameStats {
@@ -14,6 +14,8 @@ interface FrameStats {
     type?: string;
 }
 
+declare var cv: any; // OpenCV.js global
+
 class EdgeViewer {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
@@ -21,13 +23,14 @@ class EdgeViewer {
     private currentStats: FrameStats;
     private animationId: number | null = null;
     private isUploadedFrame: boolean = false;
+    private opencvReady: boolean = false;
+    private currentImageData: ImageData | null = null;
 
     constructor() {
         this.canvas = document.getElementById('frameCanvas') as HTMLCanvasElement;
         this.ctx = this.canvas.getContext('2d')!;
         this.statsDiv = document.getElementById('stats')!;
 
-        // Default stats for simulated frames
         this.currentStats = {
             width: 640,
             height: 480,
@@ -40,10 +43,42 @@ class EdgeViewer {
     }
 
     private init(): void {
-        console.log('🚀 EdgeViewer initialized');
-        this.setupButtons();
-        this.loadSampleFrame();
-        this.updateStats();
+        console.log('🚀 EdgeViewer initializing...');
+
+        // Wait for OpenCV.js to load
+        this.waitForOpenCV().then(() => {
+            console.log('✅ OpenCV.js loaded successfully!');
+            this.opencvReady = true;
+            this.setupButtons();
+            this.loadSampleFrame();
+            this.updateStats();
+        }).catch(err => {
+            console.error('❌ Failed to load OpenCV.js:', err);
+            alert('OpenCV.js failed to load. Edge detection will not work.');
+        });
+    }
+
+    private waitForOpenCV(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (typeof cv !== 'undefined' && cv.Mat) {
+                resolve();
+                return;
+            }
+
+            let attempts = 0;
+            const maxAttempts = 100;
+
+            const checkOpenCV = setInterval(() => {
+                attempts++;
+                if (typeof cv !== 'undefined' && cv.Mat) {
+                    clearInterval(checkOpenCV);
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkOpenCV);
+                    reject(new Error('OpenCV.js load timeout'));
+                }
+            }, 100);
+        });
     }
 
     private setupButtons(): void {
@@ -52,9 +87,10 @@ class EdgeViewer {
         const animateBtn = document.getElementById('animateBtn');
         const uploadInput = document.getElementById('uploadInput') as HTMLInputElement;
         const canvasWrapper = document.querySelector('.canvas-wrapper');
+        const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement;
 
         if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => this.generateNewSample());
+            refreshBtn.addEventListener('click', () => this.reprocessCurrentImage());
         }
 
         if (exportBtn) {
@@ -69,7 +105,11 @@ class EdgeViewer {
             uploadInput.addEventListener('change', (e) => this.handleFileUpload(e));
         }
 
-        // Drag & Drop support
+        if (modeSelect) {
+            modeSelect.addEventListener('change', () => this.reprocessCurrentImage());
+        }
+
+        // Drag & Drop
         if (canvasWrapper) {
             canvasWrapper.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -83,7 +123,6 @@ class EdgeViewer {
             canvasWrapper.addEventListener('drop', (e) => {
                 e.preventDefault();
                 canvasWrapper.classList.remove('drag-over');
-
                 const files = (e as DragEvent).dataTransfer?.files;
                 if (files && files.length > 0) {
                     this.handleDroppedFile(files[0]);
@@ -92,107 +131,206 @@ class EdgeViewer {
         }
     }
 
-    private handleDroppedFile(file: File): void {
-        if (!file.type.startsWith('image/')) {
-            alert('Please drop an image file (PNG, JPG, etc.)');
-            return;
-        }
-
-        console.log('📦 Dropped file:', file.name);
-        this.processImageFile(file);
-    }
-
     private loadSampleFrame(): void {
         const img = new Image();
+        img.crossOrigin = 'anonymous';
 
         img.onload = () => {
             this.canvas.width = img.width;
             this.canvas.height = img.height;
             this.ctx.drawImage(img, 0, 0);
+            this.currentImageData = this.ctx.getImageData(0, 0, img.width, img.height);
+            this.applyEdgeDetection();
             console.log('✅ Sample frame loaded');
         };
 
         img.onerror = () => {
-            console.log('⚠️ Sample image not found, drawing placeholder');
-            this.drawPlaceholder();
+            console.log('⚠️ Sample image not found, creating test pattern');
+            this.createTestPattern();
         };
 
         img.src = 'assets/sample_frame.png';
     }
 
-    private drawPlaceholder(): void {
-        this.canvas.width = this.currentStats.width;
-        this.canvas.height = this.currentStats.height;
+    private createTestPattern(): void {
+        this.canvas.width = 640;
+        this.canvas.height = 480;
 
-        // Black background
-        this.ctx.fillStyle = '#000000';
+        // Create a test pattern with shapes
+        this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Edge detection pattern
-        this.drawEdgePattern();
+        // Draw various shapes for edge detection
+        this.ctx.fillStyle = '#000000';
+        this.ctx.fillRect(100, 100, 200, 150);
 
-        // Text overlay
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 24px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🔬 Sample Edge Detection', this.canvas.width / 2, 40);
+        this.ctx.beginPath();
+        this.ctx.arc(400, 200, 80, 0, Math.PI * 2);
+        this.ctx.fill();
 
-        this.ctx.font = '16px Arial';
-        this.ctx.fillStyle = '#AAAAAA';
-        this.ctx.fillText('Simulated Canny Edge Detection Output', this.canvas.width / 2, 70);
+        this.ctx.fillRect(200, 300, 250, 100);
+
+        // Store the image data
+        this.currentImageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+
+        // Apply edge detection
+        this.applyEdgeDetection();
     }
 
-    private drawEdgePattern(): void {
-        this.ctx.strokeStyle = '#FFFFFF';
-        this.ctx.lineWidth = 1;
-
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-
-        // Concentric circles
-        for (let r = 50; r < 200; r += 30) {
-            this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-            this.ctx.stroke();
+    private applyEdgeDetection(): void {
+        if (!this.opencvReady || !this.currentImageData) {
+            console.warn('⚠️ OpenCV not ready or no image data');
+            return;
         }
 
-        // Rectangles
-        this.ctx.strokeRect(centerX - 150, centerY - 100, 300, 200);
-        this.ctx.strokeRect(centerX - 120, centerY - 80, 240, 160);
+        const startTime = performance.now();
+        const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement;
+        const mode = modeSelect ? modeSelect.value : 'edges';
 
-        // Random edge lines
-        for (let i = 0; i < 100; i++) {
-            const x = Math.random() * this.canvas.width;
-            const y = Math.random() * this.canvas.height;
-            const len = 10 + Math.random() * 30;
-            const angle = Math.random() * Math.PI * 2;
+        try {
+            // Create OpenCV matrices
+            const src = cv.matFromImageData(this.currentImageData);
+            const dst = new cv.Mat();
 
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, y);
-            this.ctx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
-            this.ctx.globalAlpha = 0.3 + Math.random() * 0.7;
-            this.ctx.stroke();
+            switch (mode) {
+                case 'raw':
+                    // Just copy the original
+                    src.copyTo(dst);
+                    this.currentStats.mode = 'Raw';
+                    break;
+
+                case 'gray':
+                    // Convert to grayscale
+                    cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+                    cv.cvtColor(dst, dst, cv.COLOR_GRAY2RGBA);
+                    this.currentStats.mode = 'Grayscale';
+                    break;
+
+                case 'edges':
+                default:
+                    // REAL Canny Edge Detection!
+                    const gray = new cv.Mat();
+                    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+                    // Apply Gaussian blur to reduce noise
+                    const blurred = new cv.Mat();
+                    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+
+                    // Apply Canny edge detection (threshold1=100, threshold2=200)
+                    const edges = new cv.Mat();
+                    cv.Canny(blurred, edges, 100, 200);
+
+                    // Convert back to RGBA for display
+                    cv.cvtColor(edges, dst, cv.COLOR_GRAY2RGBA);
+
+                    // Clean up intermediate matrices
+                    gray.delete();
+                    blurred.delete();
+                    edges.delete();
+
+                    this.currentStats.mode = 'Canny Edge Detection';
+                    break;
+            }
+
+            // Display the result
+            cv.imshow(this.canvas, dst);
+
+            // Clean up
+            src.delete();
+            dst.delete();
+
+            const processingTime = Math.round(performance.now() - startTime);
+            this.currentStats.processingTime = processingTime;
+            this.updateStats();
+
+            console.log(`✅ OpenCV processing complete (${processingTime}ms)`);
+
+        } catch (error) {
+            console.error('❌ OpenCV processing error:', error);
+            alert('Edge detection failed. See console for details.');
         }
-        this.ctx.globalAlpha = 1.0;
     }
 
-    private generateNewSample(): void {
-        // Mark as simulated frame
-        this.isUploadedFrame = false;
+    private reprocessCurrentImage(): void {
+        if (this.currentImageData) {
+            this.applyEdgeDetection();
+        } else {
+            console.warn('⚠️ No image loaded to reprocess');
+        }
+    }
 
-        // Update stats with random values
-        this.currentStats = {
-            width: 640,
-            height: 480,
-            fps: 20 + Math.random() * 15,
-            processingTime: 10 + Math.floor(Math.random() * 20),
-            mode: ['Raw', 'Grayscale', 'Edge Detection'][Math.floor(Math.random() * 3)]
+    private handleDroppedFile(file: File): void {
+        if (!file.type.startsWith('image/')) {
+            alert('Please drop an image file (PNG, JPG, etc.)');
+            return;
+        }
+        console.log('📦 Dropped file:', file.name);
+        this.processImageFile(file);
+    }
+
+    private handleFileUpload(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) return;
+        console.log('📤 Loading file:', file.name);
+        this.processImageFile(file);
+    }
+
+    private processImageFile(file: File): void {
+        this.isUploadedFrame = true;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataURL = e.target?.result as string;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+
+            img.onload = () => {
+                const width = img.width;
+                const height = img.height;
+                const megapixels = (width * height) / 1000000;
+                const estimatedRgbaSize = width * height * 4;
+                const sizeKB = Math.round(estimatedRgbaSize / 1024);
+
+                this.currentStats = {
+                    width: width,
+                    height: height,
+                    fps: 0,
+                    mode: 'Processing...',
+                    processingTime: 0,
+                    megapixels: megapixels,
+                    estimatedSize: `~${sizeKB} KB`,
+                    type: 'Uploaded'
+                };
+
+                // Draw original image
+                this.canvas.width = width;
+                this.canvas.height = height;
+                this.ctx.drawImage(img, 0, 0);
+
+                // Store image data
+                this.currentImageData = this.ctx.getImageData(0, 0, width, height);
+
+                // Apply edge detection
+                this.applyEdgeDetection();
+
+                console.log(`✅ Image loaded: ${width}x${height} (${megapixels.toFixed(2)} MP)`);
+            };
+
+            img.onerror = () => {
+                console.error('❌ Failed to load uploaded image');
+                alert('Failed to load image. Please try again.');
+            };
+
+            img.src = dataURL;
         };
 
-        this.drawPlaceholder();
-        this.updateStats();
+        reader.onerror = () => {
+            console.error('❌ FileReader error');
+            alert('Failed to read file. Please try again.');
+        };
 
-        console.log('🔄 Generated new sample frame');
+        reader.readAsDataURL(file);
     }
 
     private exportFrame(): void {
@@ -221,83 +359,20 @@ class EdgeViewer {
     private animate(): void {
         if (this.animationId === null) return;
 
-        this.generateNewSample();
+        // Cycle through different threshold values
+        this.reprocessCurrentImage();
 
         setTimeout(() => {
             if (this.animationId !== null) {
                 this.animate();
             }
-        }, 100);
-    }
-
-    private handleFileUpload(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        const file = input.files?.[0];
-
-        if (!file) return;
-
-        console.log('📤 Loading file:', file.name);
-        this.processImageFile(file);
-    }
-
-    private processImageFile(file: File): void {
-        // Mark as uploaded frame
-        this.isUploadedFrame = true;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const dataURL = e.target?.result as string;
-
-            const img = new Image();
-            img.onload = () => {
-                // Calculate real stats for uploaded image
-                const width = img.width;
-                const height = img.height;
-                const megapixels = (width * height) / 1000000;
-                const estimatedRgbaSize = width * height * 4; // RGBA = 4 bytes per pixel
-                const sizeKB = Math.round(estimatedRgbaSize / 1024);
-
-                this.currentStats = {
-                    width: width,
-                    height: height,
-                    fps: 0, // Not applicable for static image
-                    mode: 'Static Image',
-                    processingTime: 0, // Not applicable
-                    megapixels: megapixels,
-                    estimatedSize: `~${sizeKB} KB`,
-                    type: 'Uploaded'
-                };
-
-                // Draw image on canvas
-                this.canvas.width = width;
-                this.canvas.height = height;
-                this.ctx.drawImage(img, 0, 0);
-
-                this.updateStats();
-                console.log(`✅ Android frame loaded: ${width}x${height} (${megapixels.toFixed(2)} MP)`);
-            };
-
-            img.onerror = () => {
-                console.error('❌ Failed to load uploaded image');
-                alert('Failed to load image. Please try again.');
-            };
-
-            img.src = dataURL;
-        };
-
-        reader.onerror = () => {
-            console.error('❌ FileReader error');
-            alert('Failed to read file. Please try again.');
-        };
-
-        reader.readAsDataURL(file);
+        }, 500);
     }
 
     private updateStats(): void {
         let html = '';
 
         if (this.isUploadedFrame && this.currentStats.type === 'Uploaded') {
-            // Stats for uploaded images
             html = `
                 <div class="stat-item">
                     <span class="stat-label">Resolution:</span>
@@ -308,24 +383,19 @@ class EdgeViewer {
                     <span class="stat-value">${this.currentStats.megapixels?.toFixed(2)} MP</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Type:</span>
+                    <span class="stat-label">Mode:</span>
                     <span class="stat-value">${this.currentStats.mode}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Est. Size:</span>
-                    <span class="stat-value">${this.currentStats.estimatedSize}</span>
+                    <span class="stat-label">Processing Time:</span>
+                    <span class="stat-value">${this.currentStats.processingTime}ms</span>
                 </div>
             `;
         } else {
-            // Stats for simulated/generated frames
             html = `
                 <div class="stat-item">
                     <span class="stat-label">Resolution:</span>
                     <span class="stat-value">${this.currentStats.width}x${this.currentStats.height}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">FPS:</span>
-                    <span class="stat-value">${this.currentStats.fps.toFixed(1)}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Mode:</span>
@@ -347,11 +417,13 @@ class EdgeViewer {
         this.currentStats = stats;
 
         const img = new Image();
+        img.crossOrigin = 'anonymous';
         img.onload = () => {
             this.canvas.width = img.width;
             this.canvas.height = img.height;
             this.ctx.drawImage(img, 0, 0);
-            this.updateStats();
+            this.currentImageData = this.ctx.getImageData(0, 0, img.width, img.height);
+            this.applyEdgeDetection();
             console.log('✅ Frame updated from external source');
         };
         img.onerror = () => {
@@ -362,11 +434,9 @@ class EdgeViewer {
 
     public updateFromBase64(base64: string, stats?: Partial<FrameStats>): void {
         const dataURL = base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`;
-
         if (stats) {
             this.currentStats = { ...this.currentStats, ...stats };
         }
-
         this.updateFrame(dataURL, this.currentStats);
     }
 }
@@ -375,12 +445,6 @@ class EdgeViewer {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 FlamappAI Web Viewer Starting...');
     const viewer = new EdgeViewer();
-
-    // Make viewer globally accessible for testing
     (window as any).edgeViewer = viewer;
-
-    console.log('✅ Viewer ready!');
-    console.log('📝 Try these commands in console:');
-    console.log('   edgeViewer.updateFromBase64("YOUR_BASE64_STRING")');
-    console.log('   edgeViewer.updateFrame("image_url.png", stats)');
+    console.log('✅ Viewer ready! Waiting for OpenCV.js...');
 });

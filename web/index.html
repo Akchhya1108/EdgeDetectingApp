@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlamappAI Edge Viewer</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Load OpenCV.js from CDN -->
+    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="console.log('✅ OpenCV.js loaded!')"></script>
 </head>
 <body>
 <div class="container">
     <header>
         <h1>🔬 FlamappAI Edge Detection Viewer</h1>
-        <p class="subtitle">Real-time OpenCV C++ Processing</p>
+        <p class="subtitle">Real OpenCV.js Processing (Canny Edge Detection)</p>
     </header>
 
     <main>
@@ -25,10 +27,16 @@
             </div>
 
             <div class="controls">
-                <button id="refreshBtn" class="btn btn-primary">🔄 Generate New Sample</button>
+                <select id="modeSelect" class="mode-select">
+                    <option value="edges">🎯 Edge Detection (Canny)</option>
+                    <option value="gray">⚫ Grayscale</option>
+                    <option value="raw">📷 Raw Image</option>
+                </select>
+
+                <button id="refreshBtn" class="btn btn-primary">🔄 Reprocess</button>
                 <button id="animateBtn" class="btn btn-secondary">▶ Animate</button>
                 <button id="exportBtn" class="btn btn-success">💾 Export Frame</button>
-                <label for="uploadInput" class="btn btn-upload">📤 Upload Android Frame</label>
+                <label for="uploadInput" class="btn btn-upload">📤 Upload Image</label>
                 <input type="file" id="uploadInput" accept="image/*" style="display: none;">
             </div>
         </div>
@@ -39,30 +47,32 @@
                 <!-- Stats populated by TypeScript -->
             </div>
             <div id="statsInfo" class="stats-info">
-                <p>💡 <strong>Tip:</strong> Upload an Android screenshot to see real frame stats!</p>
+                <p>✅ <strong>Using REAL OpenCV.js:</strong> Actual Canny edge detection algorithm running in browser!</p>
+                <p>💡 <strong>Tip:</strong> Upload any image to see real-time edge detection processing</p>
             </div>
         </div>
 
         <div class="info-section">
             <h2>ℹ️ About</h2>
-            <p>This web viewer displays processed frames from the FlamappAI Android edge detection app.</p>
+            <p>This web viewer performs <strong>real edge detection</strong> using OpenCV.js in your browser.</p>
             <ul>
-                <li><strong>Technology:</strong> OpenCV C++ via JNI</li>
-                <li><strong>Processing:</strong> Canny Edge Detection</li>
-                <li><strong>Platform:</strong> Android Camera2 API + OpenGL ES 2.0</li>
+                <li><strong>Algorithm:</strong> Canny Edge Detection (threshold1=100, threshold2=200)</li>
+                <li><strong>Pre-processing:</strong> Gaussian Blur (5x5 kernel) for noise reduction</li>
+                <li><strong>Library:</strong> OpenCV.js 4.8.0 (WebAssembly compiled OpenCV)</li>
+                <li><strong>Android App:</strong> Uses same OpenCV C++ via JNI for native processing</li>
             </ul>
 
             <div class="feature-badges">
-                <span class="badge">📱 Real-time Processing</span>
-                <span class="badge">🎯 3 Modes: Raw/Gray/Edges</span>
-                <span class="badge">⚡ 20-30 FPS</span>
-                <span class="badge">🔧 C++ Native Code</span>
+                <span class="badge">✅ Real OpenCV Processing</span>
+                <span class="badge">🎯 Actual Canny Algorithm</span>
+                <span class="badge">⚡ Client-Side Processing</span>
+                <span class="badge">🔧 No Fake Lines</span>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>FlamappAI EdgeViewer - R&D Intern Assessment 2025</p>
+        <p>FlamappAI EdgeViewer - R&D Intern Assessment 2025 | Real OpenCV.js Implementation</p>
     </footer>
 </div>
 
